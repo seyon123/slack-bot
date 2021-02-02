@@ -58,7 +58,7 @@ def message(payload):
 
         if THIS_BOT_ID != user_id:
             print("past self check")
-            messages = ["wow!", "that's amazing." "you are starting to sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam."]
+            messages = ["wow!", "that's actually crazy.", "you sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam.", "OH MY GOSH!", "I know I am awesome... but.." ]
             client.chat_postMessage(channel=channel_id, text="<@" + user_id + "> "+random.choice(messages)+" You said:")
             client.chat_postMessage(channel=channel_id, text=msg)
 
