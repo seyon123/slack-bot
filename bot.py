@@ -26,3 +26,11 @@ app = Flask(__name__)
 #Configure the flask app to connect with Slack
 slack_event_adapter = SlackEventAdapter(SIGNING_SECRET,'/slack/events', app)
 client = slack.WebClient(token=SLACK_TOKEN)
+
+#Generic function to send a message
+def message(msg, channel_id):
+    client.chat_postMessage(channel=channel_id, text=str(msg))
+
+#Send a welcome message on start
+now = datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)")
+message("["+ now + "] Bot started on this channel.", "ram-bot")
