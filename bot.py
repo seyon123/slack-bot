@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 from datetime import datetime
+import random
 
 # To handle requests
 from flask import Flask
@@ -25,6 +26,10 @@ app = Flask(__name__)
 slack_event_adapter = SlackEventAdapter(SIGNING_SECRET,'/slack/events', app)
 client = slack.WebClient(token=SLACK_TOKEN)
 
+#
+THIS_BOT_ID = client.api_call("auth.test")['user_id']
+
+
 #Generic function to send a message
 def message(msg, channel_id):
     client.chat_postMessage(channel=channel_id, text=str(msg))
@@ -37,6 +42,7 @@ message("["+ now + "] Bot started on this channel.", "ram-bot")
 # handling Message Events
 @slack_event_adapter.on('message')
 def message(payload):
+    print("got message")
     event = payload.get('event',{})
     channel_id = event.get('channel')
     user_id = event.get('user')
@@ -47,10 +53,13 @@ def message(payload):
 
     #Make sure we aren't talking to a bot
     if "bot" not in username.lower():
+        print("past bot test")
         msg = event.get('text')
 
-        if BOT_ID != user_id:
-            client.chat_postMessage(channel=channel_id, text="@" + username + " hmm. You said:")
+        if THIS_BOT_ID != user_id:
+            print("past self check")
+            messages = ["wow!", "that's amazing." "you are starting to sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam."]
+            client.chat_postMessage(channel=channel_id, text="<@" + user_id + "> "+random.choice(messages)+" You said:")
             client.chat_postMessage(channel=channel_id, text=msg)
 
 #Start the flask webserver
