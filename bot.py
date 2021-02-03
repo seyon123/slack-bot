@@ -69,16 +69,16 @@ def message(payload):
             elif ("Weather in").lower() in msg.lower():
                 try:
                     city = msg.split("in ",1)[1]
-                    weather_api = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + WEATHER_SECRET
+                    weather_api = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + WEATHER_SECRET
                     print(weather_api)
                     request = requests.get(weather_api)
                     response = json.loads(request.text)
                     print(response)
-                    message="City: " + response["name"] + "\nWeather: " + (response["weather"][0])["main"]
+                    message="City: " + response["name"] + "\nWeather: " + (response["weather"][0])["main"] + "\nTemperature: " + str((response["main"])["temp"]) + "°C" + "\nFeels Like: " + str((response["main"])["feels_like"]) + "°C"
                     client.chat_postMessage(channel=channel_id, text=message)
                 except Exception as err:
                     print(f'An Error Occurred: {err}')
-                    
+
 #Start the flask webserver
 if __name__ == "__main__":
     app.run(debug=True)
