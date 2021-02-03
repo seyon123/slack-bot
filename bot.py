@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 import random
+import requests
+import json
 
 # To handle requests
 from flask import Flask
@@ -18,6 +20,7 @@ env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
 SIGNING_SECRET = os.environ['SIGNING_SECRET']
 SLACK_TOKEN = os.environ['SLACK_TOKEN']
+WEATHER_SECRET=os.environ['WEATHER_SECRET']
 
 #Create the flask application
 app = Flask(__name__)
@@ -57,11 +60,25 @@ def message(payload):
         if THIS_BOT_ID != user_id:
             msg_strip = msg.strip()
             print(msg_strip)
+            # Response when userr aska a question
             if msg_strip[-1] == "?":
                 messages = ["wow!", "that's actually crazy.", "you sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam.", "OH MY GOSH!", "I know I am awesome... but.." ]
                 client.chat_postMessage(channel=channel_id, text="<@" + user_id + "> "+random.choice(messages)+" You asked me:")
                 client.chat_postMessage(channel=channel_id, text=msg)
-
+            # Response to weather
+            elif ("Weather in").lower() in msg.lower():
+                try:
+                    city = msg.split("in ",1)[1]
+                    weather_api = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + WEATHER_SECRET
+                    print(weather_api)
+                    request = requests.get(weather_api)
+                    response = json.loads(request.text)
+                    print(response)
+                    message="City: " + response["name"] + "\nWeather: " + (response["weather"][0])["main"]
+                    client.chat_postMessage(channel=channel_id, text=message)
+                except Exception as err:
+                    print(f'An Error Occurred: {err}')
+                    
 #Start the flask webserver
 if __name__ == "__main__":
     app.run(debug=True)
