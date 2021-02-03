@@ -42,7 +42,6 @@ message("["+ now + "] Bot started on this channel.", "ram-bot")
 # handling Message Events
 @slack_event_adapter.on('message')
 def message(payload):
-    print("got message")
     event = payload.get('event',{})
     channel_id = event.get('channel')
     user_id = event.get('user')
@@ -53,14 +52,15 @@ def message(payload):
 
     #Make sure we aren't talking to a bot
     if "bot" not in username.lower():
-        print("past bot test")
         msg = event.get('text')
 
         if THIS_BOT_ID != user_id:
-            print("past self check")
-            messages = ["wow!", "that's actually crazy.", "you sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam.", "OH MY GOSH!", "I know I am awesome... but.." ]
-            client.chat_postMessage(channel=channel_id, text="<@" + user_id + "> "+random.choice(messages)+" You said:")
-            client.chat_postMessage(channel=channel_id, text=msg)
+            msg_strip = msg.strip()
+            print(msg_strip)
+            if msg_strip[-1] == "?":
+                messages = ["wow!", "that's actually crazy.", "you sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam.", "OH MY GOSH!", "I know I am awesome... but.." ]
+                client.chat_postMessage(channel=channel_id, text="<@" + user_id + "> "+random.choice(messages)+" You asked me:")
+                client.chat_postMessage(channel=channel_id, text=msg)
 
 #Start the flask webserver
 if __name__ == "__main__":
