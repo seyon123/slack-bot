@@ -60,11 +60,13 @@ def message(payload):
         if THIS_BOT_ID != user_id:
             msg_strip = msg.strip()
             print(msg_strip)
+            
             # Response when userr aska a question
             if msg_strip[-1] == "?":
                 messages = ["wow!", "that's actually crazy.", "you sound like a Toronto manz.", "hmm.", "you are amazing.", "yo fam.", "OH MY GOSH!", "I know I am awesome... but.." ]
                 client.chat_postMessage(channel=channel_id, text="<@" + user_id + "> "+random.choice(messages)+" You asked me:")
                 client.chat_postMessage(channel=channel_id, text=msg)
+            
             # Response to weather
             elif ("Weather in").lower() in msg.lower():
                 try:
@@ -74,7 +76,17 @@ def message(payload):
                     request = requests.get(weather_api)
                     response = json.loads(request.text)
                     print(response)
-                    message="City: " + response["name"] + "\nWeather: " + (response["weather"][0])["main"] + "\nTemperature: " + str((response["main"])["temp"]) + "°C" + "\nFeels Like: " + str((response["main"])["feels_like"]) + "°C"
+                    message=">*Current Weather for: " + response["name"] + "* :flag-" + str((response["sys"])["country"]).lower() +":"\
+                    "\n>\n>*Weather*"\
+                    "\n>Current Forecast: *" + (response["weather"][0])["description"] + "*"\
+                    "\n>\n>*Temperature* :thermometer:"\
+                    "\n>Current: *" + str((response["main"])["temp"]) + "°C*"\
+                    "\n>Feels Like: *" + str((response["main"])["feels_like"]) + "°C*"\
+                    "\n>Max: *" + str((response["main"])["temp_max"]) + "°C*"\
+                    "\n>Min: *" + str((response["main"])["temp_min"]) + "°C*"\
+                    "\n>Humidity: *" + str((response["main"])["humidity"]) + "%*"\
+                    "\n>\n>*Cloud Cover* :cloud:"\
+                    "\n>Cloudiness: *" + str((response["clouds"])["all"]) + "%*"
                     client.chat_postMessage(channel=channel_id, text=message)
                 except Exception as err:
                     print(f'An Error Occurred: {err}')
