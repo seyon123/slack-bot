@@ -8,9 +8,11 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 from datetime import datetime
+from geotext import GeoText
 import random
 import requests
 import json
+
 
 # To handle requests
 from flask import Flask
@@ -56,6 +58,8 @@ def message(payload):
     #Make sure we aren't talking to a bot
     if "bot" not in username.lower():
         msg = event.get('text')
+        places = GeoText(msg.title())
+        print(places.cities)
 
         if THIS_BOT_ID != user_id:
             msg_strip = msg.strip()
@@ -68,14 +72,13 @@ def message(payload):
                 client.chat_postMessage(channel=channel_id, text=msg)
             
             # Response to weather
-            elif ("Weather in").lower() in msg.lower():
+            elif len(places.cities) > 0:
                 try:
-                    city = msg.split("in ",1)[1]
+                    city = places.cities[0]
                     weather_api = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + WEATHER_SECRET
                     print(weather_api)
                     request = requests.get(weather_api)
                     response = json.loads(request.text)
-                    print(response)
                     message=">*Current Weather for: " + response["name"] + "* :flag-" + str((response["sys"])["country"]).lower() +":"\
                     "\n>\n>*Weather*"\
                     "\n>Current Forecast: *" + (response["weather"][0])["description"] + "*"\
